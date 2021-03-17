@@ -2,8 +2,7 @@ import org.testng.*;
 import org.testng.annotations.*;
 
 public class CalculatorTest {
-
-
+    
     // Positive cases
     @Test(description = "Addition positive test")
     public void additionTest() {
@@ -44,7 +43,6 @@ public class CalculatorTest {
     public void additionNegTest() {
         double actualResult = Calculator.addition(15.3, 2.8);
         double expectedResult = 15.3 + 2.8 + 1;
-        //   Assert.assertEquals(Math.abs(actualResult - expectedResult) <= 0.000001);
         Assert.assertNotEquals(actualResult, expectedResult);
     }
 
@@ -76,5 +74,4 @@ public class CalculatorTest {
         Double expectedResult = 15.3 + 2.8;
         Assert.assertTrue(actualResult.equals(expectedResult));
     }
-
 }
