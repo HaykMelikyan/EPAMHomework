@@ -4,17 +4,16 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
-public class greetzWebsiteTest {
+public class GreetzWebsiteTest {
+
+    private  WebDriver driver;
 
     @Test
     public void favoritesPageTest() throws InterruptedException {
-        // Set driver property, create browser instance, create waiter for that instance
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-
         // Login to greetz.nl
-        login(driver);
+        login();
 
         // Go to baloons' page
         driver.get("https://www.greetz.nl/ballonnen/denken-aan");
@@ -22,8 +21,8 @@ public class greetzWebsiteTest {
 
         // Get first product's name and price
         WebElement productItem = driver.findElement(By.cssSelector("div.b-products-grid__item:nth-child(1)"));
-        String productNameExpected = productItem.findElement(By.className("b-products-grid__item-title")).getText();
-        String productPriceExpected = "€ " + productItem.findElement(By.className("b-products-grid__item-price")).getText();
+        String ExpectedProductName = productItem.findElement(By.className("b-products-grid__item-title")).getText();
+        String ExpectedProductPrice = "€ " + productItem.findElement(By.className("b-products-grid__item-price")).getText();
 
         // Add product to favorites
         productItem.findElement(By.className("b-products-grid__item-action")).click();
@@ -41,10 +40,11 @@ public class greetzWebsiteTest {
         WebElement sidebar = driver.findElement(By.className("page-detail__sidebar-container"));
 
         // Check name and price
-        Assert.assertEquals(sidebar.findElement(By.tagName("h1")).getText(), productNameExpected,
-                "Name doesn't match. Make sure that the first product in the list hadn't been already added to favorites");
-        Assert.assertEquals(sidebar.findElement(By.className("price-block")).getText(), productPriceExpected,
-                "Price doesn't match. Make sure that the first product in the list hadn't been already added to favorites");
+        SoftAssert assertion = new SoftAssert();
+        assertion.assertEquals(sidebar.findElement(By.tagName("h1")).getText(), ExpectedProductName,
+                "Product with such name hadn't been find in the favorites");
+        Assert.assertEquals(sidebar.findElement(By.className("price-block")).getText(), ExpectedProductPrice,
+                "Product with such price hadn't been find in the favorites");
 
         // Remove the product from favorites, so the test can be repeated on this product
         driver.findElement(By.className("productdetails-favorite")).click();
@@ -55,12 +55,8 @@ public class greetzWebsiteTest {
 
     @Test
     public void priceAmountTest() throws InterruptedException {
-        // Set driver property, create browser instance, create waiter for that instance
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
-        WebDriver driver = new ChromeDriver();
-
         // Login to greetz.nl
-        login(driver);
+        login();
 
         // Go to cards' page
         driver.get("https://www.greetz.nl/kaarten/denken-aan");
@@ -97,7 +93,11 @@ public class greetzWebsiteTest {
         driver.quit();
     }
 
-    private void login(WebDriver driver) throws InterruptedException {
+    private void login() throws InterruptedException {
+        // Set driver property, create browser instance
+        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
+        driver = new ChromeDriver();
+
         // Go to the greetz.nl login page
         driver.get("https://www.greetz.nl/auth/login");
         Thread.sleep(2000);
