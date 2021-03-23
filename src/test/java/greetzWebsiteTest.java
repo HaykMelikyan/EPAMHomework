@@ -2,27 +2,23 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class greetzWebsiteTest {
 
     @Test
-    public void favoritesPageTest() {
+    public void favoritesPageTest() throws InterruptedException {
         // Set driver property, create browser instance, create waiter for that instance
         System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
         WebDriver driver = new ChromeDriver();
-        WebDriverWait waiter = new WebDriverWait(driver, 10);
 
         // Login to greetz.nl
-        login(driver, waiter);
+        login(driver);
 
         // Go to baloons' page
         driver.get("https://www.greetz.nl/ballonnen/denken-aan");
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
-                "g-wall-summary.wall-options__summary > div.label-small")));
+        Thread.sleep(2000);
 
         // Get first product's name and price
         WebElement productItem = driver.findElement(By.cssSelector("div.b-products-grid__item:nth-child(1)"));
@@ -35,11 +31,11 @@ public class greetzWebsiteTest {
         // Go to favorites' page
         driver.findElement(By.cssSelector("a[class = 'page-header__navigation-item item-user']")).click();
         driver.findElement(By.cssSelector("a[ui-sref ='mygreetz.favorites']")).click();
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.className("page_title")));
+        Thread.sleep(2000);
 
         // Go to the last added item's details' page
         driver.findElement(By.cssSelector("div.favorite-item:nth-child(1)")).click();
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.className("page-detail__sidebar-container")));
+        Thread.sleep(2000);
 
         // Get page's sidebar element
         WebElement sidebar = driver.findElement(By.className("page-detail__sidebar-container"));
@@ -58,23 +54,21 @@ public class greetzWebsiteTest {
     }
 
     @Test
-    public void priceAmountTest() {
+    public void priceAmountTest() throws InterruptedException {
         // Set driver property, create browser instance, create waiter for that instance
         System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
         WebDriver driver = new ChromeDriver();
-        WebDriverWait waiter = new WebDriverWait(driver, 10);
 
         // Login to greetz.nl
-        login(driver, waiter);
+        login(driver);
 
         // Go to cards' page
         driver.get("https://www.greetz.nl/kaarten/denken-aan");
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
-                "g-wall-summary.wall-options__summary > div.label-small")));
+        Thread.sleep(2000);
 
         // Go to the first product details' page
         driver.findElement(By.cssSelector("div.b-products-grid__item:nth-child(1)")).click();
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.className("page-detail__sidebar-container")));
+        Thread.sleep(2000);
 
         // Change amount
         WebElement amountField = driver.findElement(By.name("amount"));
@@ -103,10 +97,10 @@ public class greetzWebsiteTest {
         driver.quit();
     }
 
-    private void login(WebDriver driver, WebDriverWait waiter) {
+    private void login(WebDriver driver) throws InterruptedException {
         // Go to the greetz.nl login page
         driver.get("https://www.greetz.nl/auth/login");
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.className("inputfields")));
+        Thread.sleep(2000);
 
         // Close the popup window
         driver.findElement(By.xpath("//span[text() = 'Akkoord']")).click();
@@ -116,6 +110,6 @@ public class greetzWebsiteTest {
         inputFields.findElement(By.name("email")).sendKeys("vander@vaart.com");
         inputFields.findElement(By.name("password")).sendKeys("holand5654");
         driver.findElement(By.id("login-cta")).click();
-        waiter.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[text() = 'MyGreetz']")));
+        Thread.sleep(2000);
     }
 }
