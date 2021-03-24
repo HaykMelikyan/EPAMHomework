@@ -13,18 +13,14 @@ public class GreetzWebsiteTest {
     private WebDriver driver;
 
     @BeforeMethod
-    public void loginToGreetz() {
+    public void loginToGreetz() throws InterruptedException {
         // Set driver property, create browser instance
         System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
         driver = new ChromeDriver();
 
         // Go to the greetz.nl login page
         driver.get("https://www.greetz.nl/auth/login");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
 
         // Close the popup window
         driver.findElement(By.xpath("//span[text() = 'Akkoord']")).click();
@@ -34,11 +30,7 @@ public class GreetzWebsiteTest {
         inputFields.findElement(By.name("email")).sendKeys("vander@vaart.com");
         inputFields.findElement(By.name("password")).sendKeys("holand5654");
         driver.findElement(By.id("login-cta")).click();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(2000);
     }
 
     @AfterMethod
@@ -80,6 +72,7 @@ public class GreetzWebsiteTest {
         SoftAssert assertion = new SoftAssert();
         assertion.assertEquals(actualProductName, expectedProductName,
                 "Product with such name hadn't been find in the favorites");
+        assertion.assertAll();
         Assert.assertEquals(actualProductPrice, expectedProductPrice,
                 "Product with such price hadn't been find in the favorites");
 
@@ -108,10 +101,10 @@ public class GreetzWebsiteTest {
         WebElement priceBlock = driver.findElement(By.className("page-detail__price"));
 
         String singlePrice = priceBlock.findElement(By.className("price-normal")).getText();
-        singlePrice = singlePrice.replaceAll("[^(\\d|\\,)]", "");
+        singlePrice = singlePrice.replaceAll("[^(\\d|,)]", "");
 
         String totalPrice = priceBlock.findElement(By.className("price-total")).getText();
-        totalPrice = totalPrice.replaceAll("[^(\\d|\\,)]", "");
+        totalPrice = totalPrice.replaceAll("[^(\\d|,)]", "");
 
         // Replace , with .
         singlePrice = singlePrice.replace(',', '.');
