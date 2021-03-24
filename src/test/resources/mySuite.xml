@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name = "mySuite">
+<test name="Greetz.nl test">
+    <classes>
+        <class name="GreetzWebsiteTest">
+            <methods>
+                <include name="favoritesPageTest"/>
+                <include name="priceAmountTest"/>
+            </methods>
+        </class>
+    </classes>
+</test>
+</suite>
