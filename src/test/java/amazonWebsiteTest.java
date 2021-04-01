@@ -32,6 +32,7 @@ public class amazonWebsiteTest {
         // Choose books option and search for writer
         homePage.selectSearchOptionByString("Books");
         BookSearchResultsPage bookSearchResultsPage = homePage.searchString(writerName);
+        bookSearchResultsPage.waitUntilPageLoads();
 
         // Check writer in results
         assertion.assertTrue(bookSearchResultsPage.checkWriterInResults(writerName),
@@ -39,6 +40,7 @@ public class amazonWebsiteTest {
 
         // Go to writer's page
         WritersPage writersPage = bookSearchResultsPage.goToFirstWritersPage();
+        writersPage.waitUntilPageLoads();
 
         // Check if there is "Books by " + {searched_writer} text
         String expectedWriter = "Books By " + writerName;

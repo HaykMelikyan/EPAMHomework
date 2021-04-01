@@ -1,7 +1,6 @@
 package amazonpages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -23,12 +22,6 @@ public class WritersPage {
     public WritersPage(WebDriver driver, String writerName) {
         this.driver = driver;
         this.writerName = writerName;
-    }
-
-    public void open() {
-        BookSearchResultsPage bookSearchResultsPage = new BookSearchResultsPage(driver, writerName);
-        bookSearchResultsPage.open();
-        bookSearchResultsPage.goToFirstWritersPage();
     }
 
     public void waitUntilPageLoads() {

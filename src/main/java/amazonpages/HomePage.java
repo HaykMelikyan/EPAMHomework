@@ -8,12 +8,15 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class HomePage {
+    static final String BASE_URL = "https://www.amazon.com/";
+
     private WebDriver driver;
-    private String pageUrl = "https://www.amazon.com/";
+    private String pageUrl = BASE_URL;
 
     private final By deliverCountryLoc = By.id("glow-ingress-block");
     private final By deliverCountryNameLoc = By.id("glow-ingress-line2");
     private final By searchTypeLoc = By.id("nav-search-dropdown-card");
+    private final By dropdownOptionsLoc = By.cssSelector("select[name = 'url'] > option");
     private final By searchInputFieldLoc = By.id("twotabsearchtextbox");
 
     private final String searchOptionTemplate = "//option[normalize-space() = '%s']";
@@ -34,18 +37,19 @@ public class HomePage {
     }
 
     public void selectSearchOptionByString(String type) {
+        WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement searchDropdownElement = driver.findElement(searchTypeLoc);
         searchDropdownElement.click();
+        wait.until(ExpectedConditions.numberOfElementsToBe(dropdownOptionsLoc, 28));
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(dropdownOptionsLoc));
+
         searchDropdownElement.findElement(By.xpath(String.format(searchOptionTemplate, type))).click();
-        new WebDriverWait(driver, 10).until(ExpectedConditions
-                .textToBePresentInElementLocated(By.id("nav-search-label-id"), type));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("nav-search-label-id"), type));
     }
 
     public BookSearchResultsPage searchString(String searchText) {
         driver.findElement(searchInputFieldLoc).sendKeys(searchText + Keys.ENTER);
-        BookSearchResultsPage bookSearchResultsPage = new BookSearchResultsPage(driver, searchText);
-        bookSearchResultsPage.waitUntilPageLoads();
-        return bookSearchResultsPage;
+        return new BookSearchResultsPage(driver, searchText);
     }
 
     public String getDeliveryCountry() {

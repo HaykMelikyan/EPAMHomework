@@ -14,12 +14,9 @@ public class BookSearchResultsPage {
     private String writerName;
 
     private final By resultsCountLoc = By.cssSelector("div[class='a-section a-spacing-small a-spacing-top-small']>span:nth-child(1)");
-    private final By writersNamesLoc = By.cssSelector("div[class='s-main-slot s-result-list s-search-results sg-row'] " +
-            "div[class='sg-row'] div[class='a-section a-spacing-none'] " +
+    private final By writersNamesLoc = By.cssSelector("div[class='a-section a-spacing-none'] " +
             "div[class='a-row a-size-base a-color-secondary']");
-    private final String firstResultWriterNameXpath = "//div[@class='s-main-slot s-result-list s-search-results sg-row']" +
-            "/div[@data-component-type='s-search-result'][1]//div[@class='sg-row']//div[@class='a-section a-spacing-none']" +
-            "/div[@class='a-row a-size-base a-color-secondary']";
+    private final String firstResultWriterNameXpath = "//div[@data-component-type='s-search-result'][1]";
 
     public BookSearchResultsPage(WebDriver driver, String writerName) {
         this.driver = driver;
@@ -27,13 +24,13 @@ public class BookSearchResultsPage {
     }
 
     public void open() {
-        driver.get(pageUrl);
+        driver.get(HomePage.BASE_URL + pageUrl);
         waitUntilPageLoads();
     }
 
     public void setWriterName(String writerName) {
         this.writerName = writerName;
-        pageUrl = "https://www.amazon.com/s?k=" + writerName + "&i=stripbooks-intl-ship&ref=nb_sb_noss";
+        pageUrl = "s?k=" + writerName + "&i=stripbooks-intl-ship&ref=nb_sb_noss";
     }
 
     public void waitUntilPageLoads() {
@@ -57,10 +54,7 @@ public class BookSearchResultsPage {
 
     public WritersPage goToFirstWritersPage() {
         driver.findElement(By.xpath(firstResultWriterNameXpath
-                + "/a[contains(normalize-space(),'" + writerName + "')]")).click();
-
-        WritersPage writersPage = new WritersPage(driver, writerName);
-        writersPage.waitUntilPageLoads();
-        return writersPage;
+                + "//a[contains(normalize-space(),'" + writerName + "')]")).click();
+        return new WritersPage(driver, writerName);
     }
 }
