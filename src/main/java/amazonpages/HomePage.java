@@ -4,22 +4,40 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
 
 public class HomePage extends BasePage {
     private String pageUrl = BASE_URL;
 
-    private final By deliverCountryLoc = By.id("glow-ingress-block");
-    private final By deliverCountryNameLoc = By.id("glow-ingress-line2");
-    private final By searchTypeLoc = By.id("nav-search-dropdown-card");
-    private final By dropdownOptionsLoc = By.cssSelector("select[name = 'url'] > option");
-    private final By searchInputFieldLoc = By.id("twotabsearchtextbox");
+    @FindBy(id = "glow-ingress-block")
+    private WebElement deliverCountry;
 
-    private final String searchOptionTemplate = "//option[normalize-space() = '%s']";
+    @FindBy(id = "glow-ingress-line2")
+    private WebElement deliverCountryName;
+
+    @FindBy(css = "select[name = 'url'] > option")
+    private List<WebElement> dropdownOptions;
+
+    @FindBy(id = "nav-search-dropdown-card")
+    private WebElement searchType;
+
+    @FindBy(id = "nav-search-label-id")
+    private WebElement dropdownText;
+
+    @FindBy(id = "twotabsearchtextbox")
+    private WebElement searchInputField;
+
+    private By dropdownOptionsLoc = By.cssSelector("select[name = 'url'] > option");
+    private String searchOptionTemplate = "//option[normalize-space() = '%s']";
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
+        PageFactory.initElements(driver, this);
     }
 
     public void open() {
@@ -29,28 +47,26 @@ public class HomePage extends BasePage {
 
     public void waitUntilPageLoads() {
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(deliverCountryLoc));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(searchTypeLoc));
+        wait.until(ExpectedConditions.visibilityOf(deliverCountry));
+        wait.until(ExpectedConditions.visibilityOf(searchType));
     }
 
     public void selectSearchOptionByString(String type) {
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        WebElement searchDropdownElement = driver.findElement(searchTypeLoc);
-        searchDropdownElement.click();
+        searchType.click();
         wait.until(ExpectedConditions.numberOfElementsToBe(dropdownOptionsLoc, 28));
-        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(dropdownOptionsLoc));
+        wait.until(ExpectedConditions.visibilityOfAllElements(dropdownOptions));
 
-        searchDropdownElement.findElement(By.xpath(String.format(searchOptionTemplate, type))).click();
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("nav-search-label-id"), type));
+        searchType.findElement(By.xpath(String.format(searchOptionTemplate, type))).click();
+        wait.until(ExpectedConditions.textToBePresentInElement(dropdownText, type));
     }
 
     public BookSearchResultsPage searchString(String searchText) {
-        driver.findElement(searchInputFieldLoc).sendKeys(searchText + Keys.ENTER);
+        searchInputField.sendKeys(searchText + Keys.ENTER);
         return new BookSearchResultsPage(driver, searchText);
     }
 
     public String getDeliveryCountry() {
-        WebElement deliveryCountryBlock = driver.findElement(deliverCountryLoc);
-        return deliveryCountryBlock.findElement(deliverCountryNameLoc).getText();
+        return deliverCountryName.getText();
     }
 }
