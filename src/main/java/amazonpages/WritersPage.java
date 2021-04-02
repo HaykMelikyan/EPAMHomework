@@ -8,8 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
-public class WritersPage {
-    private WebDriver driver;
+public class WritersPage extends BasePage {
     private String writerName;
 
     private final By booksByWriterLoc = By.id("formatSelectorHeader");

@@ -8,8 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
-public class BookSearchResultsPage {
-    private WebDriver driver;
+public class BookSearchResultsPage extends BasePage {
     private String pageUrl;
     private String writerName;
 
@@ -24,7 +23,7 @@ public class BookSearchResultsPage {
     }
 
     public void open() {
-        driver.get(HomePage.BASE_URL + pageUrl);
+        driver.get(BASE_URL + pageUrl);
         waitUntilPageLoads();
     }
 

@@ -7,10 +7,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class HomePage {
-    static final String BASE_URL = "https://www.amazon.com/";
-
-    private WebDriver driver;
+public class HomePage extends BasePage {
     private String pageUrl = BASE_URL;
 
     private final By deliverCountryLoc = By.id("glow-ingress-block");
