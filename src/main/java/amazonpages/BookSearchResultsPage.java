@@ -3,6 +3,8 @@ package amazonpages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -12,14 +14,22 @@ public class BookSearchResultsPage extends BasePage {
     private String pageUrl;
     private String writerName;
 
-    private final By resultsCountLoc = By.cssSelector("div[class='a-section a-spacing-small a-spacing-top-small']>span:nth-child(1)");
-    private final By writersNamesLoc = By.cssSelector("div[class='a-section a-spacing-none'] " +
+    @FindBy(css = "div[class='a-section a-spacing-small a-spacing-top-small']>span:nth-child(1)")
+    private WebElement resultsCount;
+
+    @FindBy(css = "div[class='a-section a-spacing-none'] div[class='a-row a-size-base a-color-secondary']")
+    private List<WebElement> foundNames;
+
+    @FindBy(xpath = "//div[@data-component-type='s-search-result'][1]")
+    private WebElement firstResult;
+
+    private By foundNamesLoc = By.cssSelector("div[class='a-section a-spacing-none'] " +
             "div[class='a-row a-size-base a-color-secondary']");
-    private final String firstResultWriterNameXpath = "//div[@data-component-type='s-search-result'][1]";
 
     public BookSearchResultsPage(WebDriver driver, String writerName) {
         this.driver = driver;
         setWriterName(writerName);
+        PageFactory.initElements(driver, this);
     }
 
     public void open() {
@@ -35,15 +45,14 @@ public class BookSearchResultsPage extends BasePage {
     public void waitUntilPageLoads() {
         WebDriverWait wait = new WebDriverWait(driver, 10);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(resultsCountLoc));
-        String resultsCountString = driver.findElement(resultsCountLoc).getText();
+        wait.until(ExpectedConditions.visibilityOf(resultsCount));
+        String resultsCountString = resultsCount.getText();
         int numberOfResults = Integer.parseInt(resultsCountString.substring(2, resultsCountString.indexOf(' ')));
-        wait.until(ExpectedConditions.numberOfElementsToBe(writersNamesLoc, numberOfResults));
+        wait.until(ExpectedConditions.numberOfElementsToBe(foundNamesLoc, numberOfResults));
     }
 
     public boolean checkWriterInResults(String writerName) {
-        List<WebElement> foundNamesList = driver.findElements(writersNamesLoc);
-        for (WebElement foundName : foundNamesList) {
+        for (WebElement foundName : foundNames) {
             if (!foundName.getText().contains(writerName)) {
                 return false;
             }
@@ -52,8 +61,7 @@ public class BookSearchResultsPage extends BasePage {
     }
 
     public WritersPage goToFirstWritersPage() {
-        driver.findElement(By.xpath(firstResultWriterNameXpath
-                + "//a[contains(normalize-space(),'" + writerName + "')]")).click();
+        firstResult.findElement(By.xpath(".//a[contains(normalize-space(),'" + writerName + "')]")).click();
         return new WritersPage(driver, writerName);
     }
 }
