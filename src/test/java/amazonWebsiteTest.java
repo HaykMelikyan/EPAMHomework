@@ -1,12 +1,20 @@
 import amazonpages.BookSearchResultsPage;
 import amazonpages.HomePage;
 import amazonpages.WritersPage;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
+
+import java.io.FileReader;
+import java.io.IOException;
 
 public class amazonWebsiteTest {
     WebDriver driver;
@@ -17,10 +25,14 @@ public class amazonWebsiteTest {
         driver = new ChromeDriver();
     }
 
-    @Test
-    public void booksByAuthor() {
+    @AfterMethod
+    public void closeBrowser() {
+        driver.quit();
+    }
+
+    @Test(dataProvider = "testParams")
+    public void booksByAuthor(String writerName, String sortOption) {
         SoftAssert assertion = new SoftAssert();
-        String writerName = "Andrzej Sapkowski";
 
         // Open amazon.com
         HomePage homePage = new HomePage(driver);
@@ -45,28 +57,56 @@ public class amazonWebsiteTest {
         writersPage.waitUntilPageLoads();
 
         // Check if there is "Books by " + {searched_writer} text
-        String expectedWriter = "Books By " + writerName;
+        String expectedWriter = "Titles By " + writerName;
         String actualWriter = writersPage.getBooksByWriter();
-        assertion.assertEquals(actualWriter, expectedWriter, "There is no \"Books by " + writerName + "\" text in the page.");
+        assertion.assertEquals(actualWriter, expectedWriter, "There is no \"Titles by " + writerName + "\" text in the page.");
 
         // Check sorting by price from low to high
-        writersPage.selectSortOptionByString("Price: Low to High");
+        writersPage.selectSortOptionByString(sortOption);
         float prices[] = writersPage.obtainPrices();
-        boolean pricesSorted = true;
-        for (int i = 0; i < prices.length - 1; i++) {
-            if (prices[i] > prices[i + 1]) {
-                pricesSorted = false;
+        boolean pricesSorted = false;
+        switch (sortOption) {
+            case "Price: Low to High":
+                pricesSorted = fromLowToHigh(prices);
                 break;
-            }
+            case "Price: High to Low":
+                pricesSorted = fromHighToLow(prices);
         }
-        assertion.assertTrue(pricesSorted, "Prices are not sorted from low to high.");
+        assertion.assertTrue(pricesSorted, "Prices are not sorted with \"" + sortOption + "\" pattern.");
 
         // Perform assertions
         assertion.assertAll();
     }
 
-    @AfterMethod
-    public void closeBrowser() {
-        driver.quit();
+    private boolean fromLowToHigh(float sortedNums[]) {
+        for (int i = 0; i < sortedNums.length - 1; i++) {
+            if (sortedNums[i] > sortedNums[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean fromHighToLow(float sortedNums[]) {
+        for (int i = 0; i < sortedNums.length - 1; i++) {
+            if (sortedNums[i] < sortedNums[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @DataProvider(name = "testParams")
+    public static Object[][] nameAndSort() throws IOException, ParseException {
+        Object[][] testParams = new Object[4][2];
+
+        JSONArray paramsJSON = (JSONArray) (new JSONParser().parse(
+                new FileReader("src/test/resources/amazonTestParams.json")));
+        for (int i = 0; i < paramsJSON.size(); i++) {
+            testParams[i][0] = ((JSONObject) paramsJSON.get(i)).get("writerName");
+            testParams[i][1] = ((JSONObject) paramsJSON.get(i)).get("sortOption");
+        }
+
+        return testParams;
     }
 }
