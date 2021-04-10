@@ -13,8 +13,6 @@ public class APIRequest {
     public APIRequest() {
     }
 
-    ;
-
     public APIRequest(Header header) {
         setHeader(header);
     }
