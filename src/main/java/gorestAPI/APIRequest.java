@@ -5,25 +5,25 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 
-import java.util.Optional;
-
 public class APIRequest {
     private Header header;
     private int postId;
-
     private String endPoint = "";
 
-    public APIRequest() {};
+    public APIRequest() {
+    }
 
-    public APIRequest(Header header){
+    ;
+
+    public APIRequest(Header header) {
         setHeader(header);
     }
 
-    public APIRequest(String endPoint){
+    public APIRequest(String endPoint) {
         setEndPoint(endPoint);
     }
 
-    public APIRequest(Header header, String endPoint){
+    public APIRequest(Header header, String endPoint) {
         setHeader(header);
         setEndPoint(endPoint);
     }
@@ -44,7 +44,7 @@ public class APIRequest {
         this.endPoint = endPoint;
     }
 
-    public void post(User user) {
+    public int post(User user) {
         Response postResponse = RestAssured
                 .given()
                 .header(header)
@@ -56,6 +56,7 @@ public class APIRequest {
                 .extract()
                 .response();
         postId = postResponse.jsonPath().getInt("data.id");
+        return postId;
     }
 
     public Response get() {
