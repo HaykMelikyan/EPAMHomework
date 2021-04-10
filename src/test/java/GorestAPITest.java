@@ -2,91 +2,49 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
+import gorestAPI.*;
+
 public class GorestAPITest {
+    Header header = new Header("Authorization", "Bearer 53b517c08020390a239e02b19714d9e6665715878869e69f811d3e81e8a0029a");
+    APIRequest apiRequest;
 
     @BeforeClass
     public void setBase() {
         RestAssured.baseURI = "https://gorest.co.in/";
         RestAssured.basePath = "public-api/";
+        apiRequest = new APIRequest(header, "users/");
+    }
+
+    @AfterClass
+    public void deleteUser() {
+        apiRequest.delete();
     }
 
     @Test
     public void APITestGorest() {
-        Header header = new Header("Authorization", "Bearer 53b517c08020390a239e02b19714d9e6665715878869e69f811d3e81e8a0029a");
-
-        String name = "HaykPost Test";
-        String email = "HaykPostasd@test.io";
-        String gender = "Male";
-        String status = "Active";
-
-        String postBody = String.format("{\n" +
-                        "     \"name\": \"%s\",\n" +
-                        "     \"email\": \"%s\",\n" +
-                        "     \"gender\": \"%s\",\n" +
-                        "     \"status\": \"%s\"\n" +
-                        "}\n",
-                name, email, gender, status);
+        User user = new User("HaykPost Test", "HaykPostn1@test.io", "Male", "Active");
 
         // Post a user and obtain id
-        int postId = post(postBody, header);
+        apiRequest.post(user);
 
         // Get user by id
-        Response getResponse = get(postId);
+        Response getResponse = apiRequest.get();
 
         // Assertions
         SoftAssert assertion = new SoftAssert();
-
-        String actualName = getResponse.jsonPath().getString("data.name");
-        assertion.assertEquals(actualName, name, "");
-
-        String actualEmail = getResponse.jsonPath().getString("data.email");
-        assertion.assertEquals(actualEmail, email);
-
-        String actualGender = getResponse.jsonPath().getString("data.gender");
-        assertion.assertEquals(actualGender, gender);
-
-        String actualStatus = getResponse.jsonPath().getString("data.status");
-        assertion.assertEquals(actualStatus, status);
-
+        assertion.assertEquals(getField(getResponse, "data.name"), user.getName(), "Name doesn't match.");
+        assertion.assertEquals(getField(getResponse, "data.email"), user.getEmail(), "Email doesn't match.");
+        assertion.assertEquals(getField(getResponse, "data.gender"), user.getGender(), "Gender doesn't match.");
+        assertion.assertEquals(getField(getResponse, "data.status"), user.getStatus(), "Status doesn't match.");
         assertion.assertAll();
-
-        // Delete user by id
-        delete(postId, header);
     }
 
-    public int post(String postBody, Header header) {
-        Response postResponse = RestAssured
-                .given()
-                .header(header)
-                .body(postBody)
-                .contentType(ContentType.JSON)
-                .when()
-                .post("users")
-                .then()
-                .extract()
-                .response();
-
-        return postResponse.jsonPath().getInt("data.id");
-    }
-
-    public Response get(int postId) {
-        return RestAssured
-                .when()
-                .get("users/" + postId)
-                .then()
-                .extract()
-                .response();
-    }
-
-    public void delete(int postId, Header header) {
-        RestAssured
-                .given()
-                .header(header)
-                .when()
-                .delete("users/" + postId);
+    public String getField(Response response, String path) {
+        return response.jsonPath().getString(path);
     }
 }
