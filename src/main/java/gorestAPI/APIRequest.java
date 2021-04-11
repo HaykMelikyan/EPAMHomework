@@ -8,37 +8,10 @@ import io.restassured.response.Response;
 public class APIRequest {
     private Header header;
     private int postId;
-    private String endPoint = "";
-
-    public APIRequest() {
-    }
-
-    public APIRequest(Header header) {
-        setHeader(header);
-    }
-
-    public APIRequest(String endPoint) {
-        setEndPoint(endPoint);
-    }
+    private String endPoint;
 
     public APIRequest(Header header, String endPoint) {
-        setHeader(header);
-        setEndPoint(endPoint);
-    }
-
-    public void setHeader(Header header) {
         this.header = header;
-    }
-
-    public int getPostId() {
-        return postId;
-    }
-
-    public void setPostId(int postId) {
-        this.postId = postId;
-    }
-
-    public void setEndPoint(String endPoint) {
         this.endPoint = endPoint;
     }
 
@@ -48,29 +21,22 @@ public class APIRequest {
                 .header(header)
                 .contentType(ContentType.JSON)
                 .body(user)
-                .when()
                 .post(endPoint)
-                .then()
-                .extract()
-                .response();
+                .thenReturn();
         postId = postResponse.jsonPath().getInt("data.id");
         return postId;
     }
 
     public Response get() {
         return RestAssured
-                .when()
                 .get(endPoint + postId)
-                .then()
-                .extract()
-                .response();
+                .thenReturn();
     }
 
     public void delete() {
         RestAssured
                 .given()
                 .header(header)
-                .when()
                 .delete(endPoint + postId);
     }
 }

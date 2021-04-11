@@ -1,20 +1,22 @@
 package gorestAPI;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@AllArgsConstructor
 public final class User {
     private String name;
     private String email;
     private String gender;
     private String status;
 
-    public User(String name, String email, String gender, String status) {
-        this.name = name;
-        this.email = email;
-        this.gender = gender;
-        this.status = status;
+    public static User getRandomUser() {
+        return new User(
+                "HaykPost Test" + System.currentTimeMillis(),
+                "HaykPostn" + System.currentTimeMillis() + "@test.io",
+                "Male",
+                "Active"
+        );
     }
 }

@@ -9,8 +9,8 @@ import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
 public class GorestAPITest {
-    Header header = new Header("Authorization", "Bearer 53b517c08020390a239e02b19714d9e6665715878869e69f811d3e81e8a0029a");
-    APIRequest apiRequest;
+    private Header header = new Header("Authorization", "Bearer 53b517c08020390a239e02b19714d9e6665715878869e69f811d3e81e8a0029a");
+    private APIRequest apiRequest;
 
     @BeforeClass
     public void setBase() {
@@ -26,7 +26,7 @@ public class GorestAPITest {
 
     @Test
     public void APITestGorest() {
-        User user = new User("HaykPost Test", "HaykPostn1@test.io", "Male", "Active");
+        User user = User.getRandomUser();
 
         // Post a user and obtain id
         apiRequest.post(user);
