@@ -1,22 +1,17 @@
-import gorestAPI.APIRequest;
+import gorestAPI.ApiRequest;
 import gorestAPI.User;
-import io.restassured.RestAssured;
-import io.restassured.http.Header;
 import io.restassured.response.Response;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-public class GorestAPITest {
-    private Header header = new Header("Authorization", "Bearer 53b517c08020390a239e02b19714d9e6665715878869e69f811d3e81e8a0029a");
-    private APIRequest apiRequest;
+public class GoRestApiTest {
+    private ApiRequest apiRequest;
 
     @BeforeClass
     public void setBase() {
-        RestAssured.baseURI = "https://gorest.co.in/";
-        RestAssured.basePath = "public-api/";
-        apiRequest = new APIRequest(header, "users/");
+        apiRequest = new ApiRequest("users/");
     }
 
     @AfterClass
@@ -25,7 +20,7 @@ public class GorestAPITest {
     }
 
     @Test
-    public void APITestGorest() {
+    public void goRestPostUserTest() {
         User user = User.getRandomUser();
 
         // Post a user and obtain id
@@ -43,7 +38,7 @@ public class GorestAPITest {
         assertion.assertAll();
     }
 
-    public String getField(Response response, String path) {
+    private String getField(Response response, String path) {
         return response.jsonPath().getString(path);
     }
 }
