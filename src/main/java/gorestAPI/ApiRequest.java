@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 public class ApiRequest {
     private final PropertyReader propReader = new PropertyReader("src/main/resources/ApiRequestProp.properties");
 
-    public ApiRequest() {
+    {
         RestAssured.baseURI = propReader.getProperty("BASE_URI");
         RestAssured.basePath = propReader.getProperty("BASE_PATH");
     }
@@ -40,20 +40,18 @@ public class ApiRequest {
                 .response();
     }
 
-    public Response delete(String endPoint) {
-        return RestAssured
+    public void delete(String endPoint) {
+        RestAssured
                 .given()
                 .spec(requestSpec())
                 .delete(endPoint)
                 .then()
-                .spec(responseSpec())
-                .extract()
-                .response();
+                .spec(responseSpec());
     }
 
     private RequestSpecification requestSpec() {
         return new RequestSpecBuilder()
-                .addHeader("Authorization", propReader.getProperty("AUTHTORIZATION_TOKEN"))
+                .addHeader("Authorization", propReader.getProperty("AUTHORIZATION_TOKEN"))
                 .setContentType(ContentType.JSON)
                 .build();
     }

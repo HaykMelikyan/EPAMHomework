@@ -1,45 +1,61 @@
 import gorestAPI.ApiRequest;
 import gorestAPI.User;
 import io.restassured.response.Response;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
 public class GoRestApiTest {
     private User user;
+    ApiRequest apiRequest;
+    String endPoint;
+
+    @BeforeMethod
+    public void setup() {
+        apiRequest = new ApiRequest();
+        endPoint = "users/";
+    }
 
     @Test
     public void goRestPostUserTest() {
-        ApiRequest apiRequest = new ApiRequest();
-        String endPoint = "users/";
         user = User.getRandomUser();
 
         // Post a user and obtain id
         Response postResponse = apiRequest.post(endPoint, user);
-        checkResponse(postResponse);
         String userId = getField(postResponse, "data.id");
 
-        // Get user by id
+        // Get user and check response
         Response getResponse = apiRequest.get(endPoint + userId);
-        checkResponse(getResponse);
-
-        // Delete user by id
-        Response deleteResponse = apiRequest.delete(endPoint + userId);
-        checkDelete(deleteResponse);
+        checkResponseMatch(getResponse);
     }
 
-    private void checkResponse(Response response) {
+    @Test
+    public void goRestDeleteTest() {
+        user = User.getRandomUser();
+
+        // Post a user and obtain id
+        Response postResponse = apiRequest.post(endPoint, user);
+        String userId = getField(postResponse, "data.id");
+
+        // Delete user by id
+        apiRequest.delete(endPoint + userId);
+
+        // Get user and check response
+        Response getResponse = apiRequest.get(endPoint + userId);
+        SoftAssert assertion = new SoftAssert();
+        if(getField(getResponse, "code").equals("404"))
+            assertion.assertEquals(getField(getResponse, "data.message"), "Resource not found");
+        else
+            assertion.assertNotEquals(getField(getResponse, "data.email"), user.getEmail(), "User with that email hasn't been deleted.");
+        assertion.assertAll();
+    }
+
+    private void checkResponseMatch(Response response) {
         SoftAssert assertion = new SoftAssert();
         assertion.assertEquals(getField(response, "data.name"), user.getName(), "Name doesn't match.");
         assertion.assertEquals(getField(response, "data.email"), user.getEmail(), "Email doesn't match.");
         assertion.assertEquals(getField(response, "data.gender"), user.getGender(), "Gender doesn't match.");
         assertion.assertEquals(getField(response, "data.status"), user.getStatus(), "Status doesn't match.");
-        assertion.assertAll();
-    }
-
-    private void checkDelete(Response response) {
-        SoftAssert assertion = new SoftAssert();
-        assertion.assertEquals(getField(response, "code"), "204", "Delete status code is not 204.");
-        assertion.assertEquals(getField(response, "data"), null, "Deleted data isn't null.");
         assertion.assertAll();
     }
 
